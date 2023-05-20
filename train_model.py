@@ -2,10 +2,8 @@ import cv2
 import numpy as np
 from skimage.feature import hog, local_binary_pattern
 from skimage.color import rgb2gray
-from sklearn.model_selection import train_test_split
 from sklearn import svm
 import joblib
-from sklearn.metrics import accuracy_score
 
 # load images of Genki-4k 
 def load_data():
