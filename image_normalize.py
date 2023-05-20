@@ -25,7 +25,7 @@ def detect_face_crop(images):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the grayscale image
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
 
         # Crop the image to show only the detected face(s)
         for (x, y, w, h) in faces:
