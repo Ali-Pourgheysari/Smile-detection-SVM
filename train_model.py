@@ -4,7 +4,9 @@ from skimage.feature import hog, local_binary_pattern
 from skimage.color import rgb2gray
 from sklearn import svm
 import joblib
-import image_normalize as imn
+from image_normalize import load_data
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 def extreact_features(images):
     
@@ -17,33 +19,55 @@ def extreact_features(images):
         gray_image = rgb2gray(image)
         
         # Extract HOG features
-        hog_feature_vector = hog(gray_image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1))
+        hog_feature_vector = hog(image, orientations=8, pixels_per_cell=(16, 16),
+                                cells_per_block=(1, 1), channel_axis=-1)
         hog_features.append(hog_feature_vector)
         
         # Extract LBP features
-        lbp_feature_vector = local_binary_pattern(gray_image, P=8, R=5).ravel()
-        lbp_features.append(lbp_feature_vector)
+        lbp_feature_vector = local_binary_pattern(gray_image, 24, 3).ravel()
+        # histogram of LBP features
+        hist, _ = np.histogram(lbp_feature_vector, 256, (0, 256))
+        lbp_features.append(hist)
 
     # Combine the feature vectors into a single matrix
-    features = np.hstack((np.array(hog_features), np.array(lbp_features)))
+    features = [[*x, *y] for x, y in zip(hog_features, lbp_features)]
     return features
 
-def train_and_save(X_train, y_train):
+def train_and_save(X_train, y_train, model_name):
     # Choose an appropriate kernel function
     model = svm.SVC(kernel='rbf')
 
     # Train the SVM model on the training set
     model.fit(X_train, y_train)
 
+    print("Accuracy:", model.score(X_train, y_train))
+
     # Save the trained classifier using joblib
-    joblib.dump(model, 'svm_model.joblib')
+    joblib.dump(model, model_name)
+
+def test(X_test, y_test, model_name):
+
+    # Load SVM model from disk
+    model = joblib.load(model_name)
+
+    # Make predictions on the testing set using the loaded model
+    y_pred = model.predict(X_test)
+
+    # Evaluate the performance of the loaded model
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy)
 
 # main function
 def main():
-    images, labels = imn.load_data()
-    features = extreact_features(images)
-    train_and_save(features, labels)
-    
+    images, labels = load_data(filename='Genki_4K/cropped_images')
+    combined = list(zip(images, labels))
+    np.random.shuffle(combined)
+    shuffled_images, shuffled_labels = zip(*combined)
+    features = extreact_features(shuffled_images)
+    X_train, X_test, y_train, y_test = train_test_split(features, shuffled_labels, test_size=0.25)
+    model_name = 'svm_model.joblib'
+    train_and_save(X_train, y_train, model_name)
+    test(X_test, y_test, model_name)
 
 if __name__ == '__main__':
     main()
