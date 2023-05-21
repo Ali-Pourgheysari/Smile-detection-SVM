@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from skimage.feature import hog, local_binary_pattern
 from skimage.color import rgb2gray
@@ -59,13 +58,23 @@ def test(X_test, y_test, model_name):
 
 # main function
 def main():
+    # load data
     images, labels = load_data(filename='Genki_4K/cropped_images')
+
+    # shuffle images and labels
     combined = list(zip(images, labels))
     np.random.shuffle(combined)
     shuffled_images, shuffled_labels = zip(*combined)
+
+    # extract features
     features = extreact_features(shuffled_images)
+
+    # split data of train and test
     X_train, X_test, y_train, y_test = train_test_split(features, shuffled_labels, test_size=0.25)
+
     model_name = 'svm_model.joblib'
+
+    # train and test the model
     train_and_save(X_train, y_train, model_name)
     test(X_test, y_test, model_name)
 
