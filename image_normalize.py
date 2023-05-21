@@ -1,14 +1,14 @@
 import cv2
 
-# load images of Genki-4k 
-def load_data(filename, min_iter_range = 0, max_iter_range = 4000):
+# load images of Genki-4k
+def load_data(filename, min_iter_range=0, max_iter_range=4000):
     images = []
     # load images of dataset
     for i in range(min_iter_range, max_iter_range):
         # the dataset is in Genki_4k folder. change this to your dataset image path
         img = cv2.imread(f'{filename}/file{i:04}.jpg')
         images.append(img)
-    
+
     # load labels. the labels are in the below path. change this to your dataset labels path
     labels = []
     with open('Genki_4K/labels.txt', 'r') as f:
@@ -29,7 +29,8 @@ def detect_face_crop(images):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the grayscale image
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+        faces = face_cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=5)
 
         # Crop the image to show only the detected face(s)
         for (x, y, w, h) in faces:
@@ -39,10 +40,11 @@ def detect_face_crop(images):
 
     return cropped_images
 
-# save all images
+
 def save_images(images, filename):
     for i, img in enumerate(images):
         cv2.imwrite(f'{filename}/file{i:04}.jpg', img)
+
 
 def resize(images):
     resized_images = []
@@ -56,10 +58,11 @@ def resize(images):
         resized_images.append(resized_img)
 
     return resized_images
-    
-# main function
+
+
 def main():
-    images, _ = load_data(filename='Genki_4K/files', min_iter_range=1, max_iter_range=4001)
+    images, _ = load_data(filename='Genki_4K/files',
+                          min_iter_range=1, max_iter_range=4001)
     cropped_images = detect_face_crop(images)
     resized_images = resize(cropped_images)
     save_images(resized_images, filename='Genki_4k/cropped_images')
