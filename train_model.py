@@ -5,6 +5,7 @@ from skimage.feature import hog, local_binary_pattern
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+import imgaug.augmenters as iaa
 
 from image_normalize import load_data
 
@@ -66,13 +67,34 @@ def test(X_test, y_test, model_name = 'svm_model.joblib'):
     accuracy = accuracy_score(y_test, y_pred)
     print("Test accuracy:", accuracy)
 
+def augmentate_data(x_train, y_train):
+    # Define the augmentations to be applied
+    seq = iaa.Sequential([
+    iaa.Fliplr(0.5),
+    iaa.GaussianBlur(sigma=(0, 1.0)),
+    iaa.AddToHueAndSaturation(value=(-10, 10), per_channel=True)
+    ])
+
+    # Convert the image list to a numpy array
+    image_array = np.array(x_train)
+
+    # Apply the augmentations to each image and its corresponding label
+    augmented_images, augmented_labels = [], []
+    for i in range(len(image_array)):
+        augmented_image = seq(image=image_array[i])
+        augmented_images.append(augmented_image)
+        augmented_labels.append(y_train[i])
+
+
+    return augmented_images, augmented_labels
 
 def main():
     # load data
     images, labels = load_data(filename='Genki_4K/cropped_images')
-
+    # apply augmentation
+    augmentatation_images, augmentation_labels = augmentate_data(images, labels)
     # shuffle images and labels
-    combined = list(zip(images, labels))
+    combined = list(zip(augmentatation_images + images, augmentation_labels + labels))
     np.random.shuffle(combined)
     shuffled_images, shuffled_labels = zip(*combined)
 
@@ -81,11 +103,11 @@ def main():
 
     # split data of train and test
     X_train, X_test, y_train, y_test = train_test_split(
-        features, shuffled_labels, test_size=0.25)
+        features, shuffled_labels, test_size=0.20)
 
     # train and test the model
-    train_and_save(X_train, y_train)
-    test(X_test, y_test)
+    train_and_save(X_train, y_train, model_name = 'svm_model_temp.joblib')
+    test(X_test, y_test, model_name = 'svm_model_temp.joblib')
 
 
 if __name__ == '__main__':
