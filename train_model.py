@@ -4,24 +4,7 @@ from skimage.feature import hog, local_binary_pattern
 from skimage.color import rgb2gray
 from sklearn import svm
 import joblib
-
-# load images of Genki-4k 
-def load_data():
-    images = []
-    # load images of dataset
-    for i in range(1, 4001):
-        # the dataset is in Genki_4k folder. change this to your dataset image path
-        img = cv2.imread(f'Genki_4K/cropped_images/file{i:04}.jpg')
-        images.append(img)
-    
-    # load labels. the labels are in the below path. change this to your dataset labels path
-    labels = []
-    with open('Genki_4K/labels.txt', 'r') as f:
-        for line in f:
-            element = line.split()[0]
-            labels.append(element)
-
-    return images, labels
+import image_normalize as imn
 
 def extreact_features(images):
     
@@ -57,7 +40,7 @@ def train_and_save(X_train, y_train):
 
 # main function
 def main():
-    images, labels = load_data()
+    images, labels = imn.load_data()
     features = extreact_features(images)
     train_and_save(features, labels)
     

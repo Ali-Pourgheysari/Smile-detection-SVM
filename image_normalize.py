@@ -9,10 +9,14 @@ def load_data():
         img = cv2.imread(f'Genki_4K/files/file{i:04}.jpg')
         images.append(img)
     
-    # # load labels. the labels are in the below path. change this to your dataset labels path
-    # labels = pd.read_csv('Genki_4K/labels.txt', sep=" ", header=None)
+    # load labels. the labels are in the below path. change this to your dataset labels path
+    labels = []
+    with open('Genki_4K/labels.txt', 'r') as f:
+        for line in f:
+            element = line.split()[0]
+            labels.append(element)
 
-    return images
+    return images, element
 
 # detect and crop face
 def detect_face_crop(images):
@@ -55,7 +59,7 @@ def resize(images):
     
 # main function
 def main():
-    images = load_data()
+    images, _ = load_data()
     cropped_images = detect_face_crop(images)
     resized_images = resize(cropped_images)
     save_images(resized_images)
