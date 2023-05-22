@@ -6,6 +6,7 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 import imgaug.augmenters as iaa
+from tqdm import tqdm
 
 from image_normalize import load_data
 
@@ -16,7 +17,7 @@ def extract_features(images):
     hog_features = []
     lbp_features = []
 
-    for image in images:
+    for image in tqdm(images, desc='feature extraction'):
         hog_feature_vector, hist = hog_lbp(image)
         hog_features.append(hog_feature_vector)
         lbp_features.append(hist)
@@ -44,10 +45,12 @@ def hog_lbp(image):
 
 def train_and_save(X_train, y_train, model_name = 'svm_model.joblib'):
     # Choose an appropriate kernel function
-    model = svm.SVC(gamma="auto", kernel='rbf')
-
+    model = svm.SVC(gamma="auto", kernel='linear')
+    
+    print('Model is training...')
     # Train the SVM model on the training set
     model.fit(X_train, y_train)
+    print('Model trained...')
 
     print("Train accuracy:", model.score(X_train, y_train))
 
@@ -80,7 +83,7 @@ def augmentate_data(x_train, y_train):
 
     # Apply the augmentations to each image and its corresponding label
     augmented_images, augmented_labels = [], []
-    for i in range(len(image_array)):
+    for i in tqdm(range(len(image_array)), desc='augmentation'):
         augmented_image = seq(image=image_array[i])
         augmented_images.append(augmented_image)
         augmented_labels.append(y_train[i])
