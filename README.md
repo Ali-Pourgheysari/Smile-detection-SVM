@@ -40,4 +40,3 @@ Note: Make sure to place the appropriate Haar Cascade classifier (`haarcascade_f
 
 ## Credits
 The project uses the Genki-4k dataset and the OpenCV library for face detection. The SVM classifier is trained on extracted HOG and LBP features. The Smile Detection with Webcam project serves as a basic example of real-time smile detection using machine learning techniques.
-
