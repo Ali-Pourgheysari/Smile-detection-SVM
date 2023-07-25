@@ -5,7 +5,7 @@
 The `image_normalize.py` script is responsible for loading the images from the Genki-4k dataset, detecting faces in the images using the Haar Cascade classifier, cropping the images to show only the detected faces, and resizing the cropped images to a uniform size. The processed images are saved in the `cropped_images` folder.
 
 ## Part 2: Feature Extraction and Model Training
-The `train_model.py` script loads the SVM model, accesses the webcam, and performs real-time smile detection on the video feed. The script detects faces using the Haar Cascade classifier, extracts features from the detected faces, and uses the trained SVM model to predict whether the detected faces are smiling or not. The webcam feed is displayed in real-time, with a rectangle drawn around smiling faces and a "Smiling" label displayed above them.
+The `train_model.py` script extracts HOG (Histogram of Oriented Gradients) and LBP (Local Binary Patterns) features from the cropped images. The script then trains an SVM classifier on the extracted features. Data augmentation is applied to improve the robustness of the trained model. The trained SVM model is saved as `svm_model_temp.joblib`.
 
 ## Part 3: Smile Detection with Webcam
 The `test_model.py` script loads the SVM model, accesses the webcam, and performs real-time smile detection on the video feed. The script detects faces using the Haar Cascade classifier, extracts features from the detected faces, and uses the trained SVM model to predict whether the detected faces are smiling or not. The webcam feed is displayed in real-time, with a rectangle drawn around smiling faces and a "Smiling" label displayed above them.
